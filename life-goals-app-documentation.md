@@ -170,11 +170,8 @@ Modal affichant la liste des objectifs accomplis.
 ## Installation
 
 ```bash
-# 1. Extraire l'archive ZIP
-unzip life-goals-app-updated.zip
-
-# 2. Aller dans le dossier
-cd life-goals-app
+# 1. Aller dans le dossier
+cd /wherethefudgeyouputthisfile/life-goals-app
 
 # 3. Installer les dependances
 npm install

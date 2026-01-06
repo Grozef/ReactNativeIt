@@ -59,6 +59,14 @@ export default function App() {
     setTimeout(() => setShowConfetti(false), 3000);
   };
 
+  const undoGoalHandler = (id) => {
+    setGoals((currentGoals) =>
+      currentGoals.map((goal) =>
+        goal.id === id ? { ...goal, done: false } : goal
+      )
+    );
+  };
+
   const startEditHandler = (goal) => {
     if (goal.done) return;
     setEditingGoal(goal);
@@ -140,6 +148,7 @@ export default function App() {
           goals={completedGoals}
           onClose={() => setCompletedModalVisible(false)}
           onDelete={deleteGoalHandler}
+          onUndo={undoGoalHandler}
         />
 
         {showConfetti && (

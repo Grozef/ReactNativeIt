@@ -1,7 +1,34 @@
 import { StyleSheet, View, Text, FlatList, Pressable, Modal } from 'react-native';
-import GoalItem from './GoalItem';
 
-export default function CompletedGoals({ visible, goals, onClose, onDelete }) {
+function CompletedGoalItem({ id, text, onDelete, onUndo }) {
+  return (
+    <View style={styles.goalItem}>
+      <View style={styles.textContainer}>
+        <Text style={styles.goalText}>{text}</Text>
+      </View>
+      <Pressable
+        style={({ pressed }) => [
+          styles.undoButton,
+          pressed && styles.pressedButton,
+        ]}
+        onPress={() => onUndo(id)}
+      >
+        <Text style={styles.undoText}>&#8634;</Text>
+      </Pressable>
+      <Pressable
+        style={({ pressed }) => [
+          styles.deleteButton,
+          pressed && styles.pressedButton,
+        ]}
+        onPress={() => onDelete(id)}
+      >
+        <Text style={styles.deleteText}>&#10005;</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+export default function CompletedGoals({ visible, goals, onClose, onDelete, onUndo }) {
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>
       <View style={styles.modalContainer}>
@@ -33,13 +60,11 @@ export default function CompletedGoals({ visible, goals, onClose, onDelete }) {
                 data={goals}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                  <GoalItem
+                  <CompletedGoalItem
                     id={item.id}
                     text={item.text}
-                    done={true}
                     onDelete={onDelete}
-                    onEdit={() => {}}
-                    onDone={() => {}}
+                    onUndo={onUndo}
                   />
                 )}
                 showsVerticalScrollIndicator={false}
@@ -113,5 +138,47 @@ const styles = StyleSheet.create({
   emptySubtext: {
     color: '#6b7280',
     fontSize: 14,
+  },
+  goalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a2e1a',
+    borderRadius: 8,
+    marginVertical: 6,
+    overflow: 'hidden',
+    borderLeftWidth: 4,
+    borderLeftColor: '#4ade80',
+  },
+  textContainer: {
+    flex: 1,
+    padding: 16,
+  },
+  goalText: {
+    color: '#9ca3af',
+    fontSize: 16,
+    textDecorationLine: 'line-through',
+  },
+  undoButton: {
+    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteButton: {
+    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pressedButton: {
+    opacity: 0.5,
+  },
+  undoText: {
+    color: '#60a5fa',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  deleteText: {
+    color: '#ff6b6b',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
