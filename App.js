@@ -7,6 +7,7 @@ import AddModal from './components/AddModal';
 import EditModal from './components/EditModal';
 
 const sampleGoals = [
+  "survivre",
   "Faire les courses",
   "Aller à la salle de sport 3 fois par semaine",
   "Monter à plus de 5000m d altitude",
