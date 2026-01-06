@@ -1,8 +1,8 @@
 import { StyleSheet, View, Text, Pressable } from 'react-native';
 
-export default function GoalItem({ id, text, onDelete, onEdit }) {
+export default function GoalItem({ id, text, done, onDelete, onEdit, onDone }) {
   return (
-    <View style={styles.goalItem}>
+    <View style={[styles.goalItem, done && styles.goalItemDone]}>
       <Pressable
         style={({ pressed }) => [
           styles.textContainer,
@@ -11,8 +11,19 @@ export default function GoalItem({ id, text, onDelete, onEdit }) {
         onPress={onEdit}
         android_ripple={{ color: '#4a4a6a' }}
       >
-        <Text style={styles.goalText}>{text}</Text>
+        <Text style={[styles.goalText, done && styles.goalTextDone]}>{text}</Text>
       </Pressable>
+      {!done && (
+        <Pressable
+          style={({ pressed }) => [
+            styles.doneButton,
+            pressed && styles.pressedDone,
+          ]}
+          onPress={() => onDone(id)}
+        >
+          <Text style={styles.doneText}>&#10003;</Text>
+        </Pressable>
+      )}
       <Pressable
         style={({ pressed }) => [
           styles.deleteButton,
@@ -20,7 +31,7 @@ export default function GoalItem({ id, text, onDelete, onEdit }) {
         ]}
         onPress={() => onDelete(id)}
       >
-        <Text style={styles.deleteText}>✕</Text>
+        <Text style={styles.deleteText}>&#10005;</Text>
       </Pressable>
     </View>
   );
@@ -37,6 +48,10 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     borderLeftColor: '#5e60ce',
   },
+  goalItemDone: {
+    borderLeftColor: '#4ade80',
+    backgroundColor: '#1a2e1a',
+  },
   textContainer: {
     flex: 1,
     padding: 16,
@@ -47,6 +62,23 @@ const styles = StyleSheet.create({
   goalText: {
     color: '#ffffff',
     fontSize: 16,
+  },
+  goalTextDone: {
+    color: '#9ca3af',
+    textDecorationLine: 'line-through',
+  },
+  doneButton: {
+    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pressedDone: {
+    opacity: 0.5,
+  },
+  doneText: {
+    color: '#4ade80',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   deleteButton: {
     padding: 16,
