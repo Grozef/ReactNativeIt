@@ -1,22 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { StyleSheet, View, TextInput, Text, Pressable, Modal } from 'react-native';
 
-export default function EditModal({ visible, goal, onSave, onCancel }) {
-  const [editedText, setEditedText] = useState('');
+export default function AddModal({ visible, onAdd, onCancel }) {
+  const [enteredGoal, setEnteredGoal] = useState('');
 
-  useEffect(() => {
-    if (goal) {
-      setEditedText(goal.text);
-    }
-  }, [goal]);
-
-  const saveHandler = () => {
-    onSave(editedText);
-    setEditedText('');
+  const addHandler = () => {
+    onAdd(enteredGoal);
+    setEnteredGoal('');
   };
 
   const cancelHandler = () => {
-    setEditedText('');
+    setEnteredGoal('');
     onCancel();
   };
 
@@ -24,16 +18,15 @@ export default function EditModal({ visible, goal, onSave, onCancel }) {
     <Modal visible={visible} animationType="slide" transparent={true}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Modifier l'objectif</Text>
+          <Text style={styles.modalTitle}>Nouvel objectif</Text>
 
           <TextInput
             style={styles.textInput}
-            placeholder="Modifier votre objectif..."
+            placeholder="Entrez votre objectif..."
             placeholderTextColor="#888"
-            value={editedText}
-            onChangeText={setEditedText}
+            value={enteredGoal}
+            onChangeText={setEnteredGoal}
             autoFocus={true}
-            multiline={true}
           />
 
           <View style={styles.buttonContainer}>
@@ -55,13 +48,13 @@ export default function EditModal({ visible, goal, onSave, onCancel }) {
               <Pressable
                 style={({ pressed }) => [
                   styles.button,
-                  styles.saveButton,
+                  styles.addButton,
                   pressed && styles.pressed,
                 ]}
-                onPress={saveHandler}
-                android_ripple={{ color: '#2d8a4e' }}
+                onPress={addHandler}
+                android_ripple={{ color: '#7b2cbf' }}
               >
-                <Text style={styles.buttonText}>Sauvegarder</Text>
+                <Text style={styles.buttonText}>Ajouter</Text>
               </Pressable>
             </View>
           </View>
@@ -99,8 +92,6 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     marginBottom: 20,
-    minHeight: 80,
-    textAlignVertical: 'top',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -123,8 +114,8 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: '#444',
   },
-  saveButton: {
-    backgroundColor: '#38b000',
+  addButton: {
+    backgroundColor: '#5e60ce',
   },
   buttonText: {
     color: '#ffffff',
