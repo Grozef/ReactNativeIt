@@ -2,35 +2,31 @@
  * @file src/app/store.js
  * @description Configuration du store Redux avec Redux Toolkit.
  * @see https://redux-toolkit.js.org/tutorials/quick-start
- * @version 1.0.0
+ * @version 2.0.0
  * 
- * Le store est le conteneur central qui detient tout l'etat de l'application.
- * configureStore() simplifie la configuration et ajoute automatiquement:
- * - Redux DevTools
- * - redux-thunk middleware (pour les actions async)
- * - Verification des mutations accidentelles
+ * Le store contient:
+ * - counter: etat du compteur (demo)
+ * - goals: etat des objectifs de vie
  */
 
 import { configureStore } from '@reduxjs/toolkit';
 import counterReducer from '../features/counter/counterSlice';
+import goalsReducer from '../features/goals/goalsSlice';
 
 /**
- * Store Redux configure avec tous les reducers de l'application
+ * Store Redux configure avec tous les reducers
  * 
  * @type {Object}
  * 
- * @example
- * // Structure du state:
- * // {
- * //   counter: { value: 0 }
- * // }
+ * Structure du state:
+ * {
+ *   counter: { value: 0 },
+ *   goals: { items: [...], addModalVisible: false, ... }
+ * }
  */
 export const store = configureStore({
-  /**
-   * reducer: Objet contenant tous les slice reducers
-   * Chaque cle devient une propriete du state global
-   */
   reducer: {
-    counter: counterReducer,  // state.counter sera gere par counterSlice
+    counter: counterReducer,
+    goals: goalsReducer,
   },
 });
