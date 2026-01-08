@@ -1,74 +1,61 @@
 /**
- * @file EditModal.js
- * @description Modal d'edition d'un objectif existant.
- * @version 2.0.0
+ * @file src/components/AddModal.js
+ * @description Modal d'ajout d'un nouvel objectif ou sous-objectif.
+ * @version 2.1.0
  */
 
 import { useState, useEffect } from 'react';
 import { StyleSheet, View, TextInput, Text, Pressable, Modal } from 'react-native';
 
-/**
- * Modal pour editer un objectif existant
- * 
- * @param {Object} props - Proprietes du composant
- * @param {boolean} props.visible - Visibilite de la modal
- * @param {Object|null} props.goal - Objectif a editer
- * @param {string} props.goal.id - ID de l'objectif
- * @param {string} props.goal.text - Texte de l'objectif
- * @param {Function} props.onSave - Callback de sauvegarde (newText) => void
- * @param {Function} props.onCancel - Callback d'annulation
- * @returns {JSX.Element} Composant EditModal
- */
-export default function EditModal({ visible, goal, onSave, onCancel }) {
-  /**
-   * @type {[string, Function]} Texte edite
-   */
-  const [editedText, setEditedText] = useState('');
+export default function AddModal({ visible, parentId, parentGoal, initialText = '', onAdd, onCancel }) {
+  const [enteredGoal, setEnteredGoal] = useState('');
 
-  /**
-   * Met a jour le texte quand l'objectif change
-   */
   useEffect(() => {
-    if (goal) {
-      setEditedText(goal.text);
+    if (visible) {
+      setEnteredGoal(initialText || '');
     }
-  }, [goal]);
+  }, [visible, initialText]);
 
-  /**
-   * Gere la sauvegarde des modifications
-   */
-  const saveHandler = () => {
-    onSave(editedText);
-    setEditedText('');
+  const addHandler = () => {
+    onAdd(enteredGoal, parentId);
+    setEnteredGoal('');
   };
 
-  /**
-   * Gere l'annulation de l'edition
-   */
   const cancelHandler = () => {
-    setEditedText('');
+    setEnteredGoal('');
     onCancel();
   };
+
+  const title = parentGoal 
+    ? `Sous-objectif de "${parentGoal.text}"` 
+    : 'Nouvel objectif';
+
+  const placeholder = parentGoal
+    ? 'Entrez votre sous-objectif...'
+    : 'Entrez votre objectif...';
 
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          {/* Titre */}
-          <Text style={styles.modalTitle}>Modifier l'objectif</Text>
+          <Text style={styles.modalTitle}>{title}</Text>
 
-          {/* Champ de saisie */}
+          {parentGoal && (
+            <View style={styles.parentIndicator}>
+              <Text style={styles.parentLabel}>Parent:</Text>
+              <Text style={styles.parentText}>{parentGoal.text}</Text>
+            </View>
+          )}
+
           <TextInput
             style={styles.textInput}
-            placeholder="Modifier votre objectif..."
+            placeholder={placeholder}
             placeholderTextColor="#888"
-            value={editedText}
-            onChangeText={setEditedText}
+            value={enteredGoal}
+            onChangeText={setEnteredGoal}
             autoFocus={true}
-            multiline={true}
           />
 
-          {/* Boutons d'action */}
           <View style={styles.buttonContainer}>
             <View style={styles.buttonWrapper}>
               <Pressable
@@ -88,13 +75,13 @@ export default function EditModal({ visible, goal, onSave, onCancel }) {
               <Pressable
                 style={({ pressed }) => [
                   styles.button,
-                  styles.saveButton,
+                  styles.addButton,
                   pressed && styles.pressed,
                 ]}
-                onPress={saveHandler}
-                android_ripple={{ color: '#2d8a4e' }}
+                onPress={addHandler}
+                android_ripple={{ color: '#7b2cbf' }}
               >
-                <Text style={styles.buttonText}>Sauvegarder</Text>
+                <Text style={styles.buttonText}>Ajouter</Text>
               </Pressable>
             </View>
           </View>
@@ -104,19 +91,13 @@ export default function EditModal({ visible, goal, onSave, onCancel }) {
   );
 }
 
-/**
- * Styles du composant EditModal
- * @type {Object}
- */
 const styles = StyleSheet.create({
-  /** Overlay semi-transparent */
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.7)',
   },
-  /** Contenu de la modal */
   modalContent: {
     backgroundColor: '#1e1e2e',
     borderRadius: 16,
@@ -124,7 +105,6 @@ const styles = StyleSheet.create({
     width: '90%',
     maxWidth: 400,
   },
-  /** Titre de la modal */
   modalTitle: {
     color: '#ffffff',
     fontSize: 20,
@@ -132,7 +112,24 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  /** Champ de saisie */
+  parentIndicator: {
+    backgroundColor: '#2d2d44',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    borderLeftWidth: 3,
+    borderLeftColor: '#f59e0b',
+  },
+  parentLabel: {
+    color: '#9ca3af',
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  parentText: {
+    color: '#f59e0b',
+    fontSize: 14,
+    fontWeight: '500',
+  },
   textInput: {
     backgroundColor: '#2d2d44',
     borderRadius: 8,
@@ -140,40 +137,31 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     marginBottom: 20,
-    minHeight: 80,
-    textAlignVertical: 'top',
   },
-  /** Conteneur des boutons */
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 12,
   },
-  /** Wrapper des boutons */
   buttonWrapper: {
     flex: 1,
     borderRadius: 8,
     overflow: 'hidden',
   },
-  /** Style de base des boutons */
   button: {
     padding: 14,
     borderRadius: 8,
     alignItems: 'center',
   },
-  /** Etat presse */
   pressed: {
     opacity: 0.7,
   },
-  /** Bouton annuler */
   cancelButton: {
     backgroundColor: '#444',
   },
-  /** Bouton sauvegarder */
-  saveButton: {
-    backgroundColor: '#38b000',
+  addButton: {
+    backgroundColor: '#5e60ce',
   },
-  /** Texte des boutons */
   buttonText: {
     color: '#ffffff',
     fontSize: 16,
