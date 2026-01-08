@@ -2,9 +2,10 @@
  * @file GoalItem.js
  * @description Composant d'affichage d'un objectif avec support hierarchique.
  *              Affiche les sous-objectifs de maniere recursive.
- * @version 2.0.0
+ * @version 2.2.0
  * 
  * @changelog
+ * v2.2.0 - Validation explicite des parents (pas d'auto-completion)
  * v2.0.0 - Refonte complete pour support hierarchique
  * 
  * MODIFICATIONS EFFECTUEES:
@@ -17,7 +18,8 @@
  * 6. Ajout indicateur de progression (X/Y) pour les parents
  * 7. Affichage recursif des enfants via GoalItem imbriques
  * 8. Styles: Nouveaux styles pour parents (orange), indentation, ligne de connexion
- * 9. Logique: Le bouton "done" n'apparait que pour les feuilles (sans enfants)
+ * 9. [MODIFICATION v2.2] Le bouton "done" apparait sur les parents quand tous enfants done
+ * 10. [AJOUT v2.2] Variable canBeMarkedDone pour controler l'affichage du bouton
  */
 
 import { useState } from 'react';
@@ -82,6 +84,22 @@ export default function GoalItem({
    * @type {boolean}
    */
   const effectivelyDone = isEffectivelyDone(goal);
+
+  /**
+   * [AJOUT v2.2] Verifie si tous les enfants sont done
+   * Permet d'afficher le bouton coche sur un parent
+   * @type {boolean}
+   */
+  const allChildrenDone = hasChildren 
+    ? children.every((c) => isEffectivelyDone(c)) 
+    : true;
+
+  /**
+   * [AJOUT v2.2] Verifie si l'objectif peut etre marque done
+   * Un parent peut etre marque done seulement si tous ses enfants le sont
+   * @type {boolean}
+   */
+  const canBeMarkedDone = !goal.done && (!hasChildren || allChildrenDone);
 
   /**
    * [AJOUT v2.0] Calcule le nombre d'enfants termines
@@ -158,10 +176,10 @@ export default function GoalItem({
 
         {/* 
          * [MODIFICATION v2.0] Bouton marquer comme termine
-         * N'apparait que pour les feuilles (objectifs sans enfants)
-         * Les parents sont auto-completes quand tous leurs enfants le sont
+         * [MODIFICATION v2.2] Apparait sur les parents aussi quand tous enfants done
+         * Utilise canBeMarkedDone pour determiner l'affichage
          */}
-        {!effectivelyDone && !hasChildren && (
+        {canBeMarkedDone && (
           <Pressable
             style={({ pressed }) => [
               styles.doneButton,

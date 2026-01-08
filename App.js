@@ -2,9 +2,11 @@
  * @file App.js
  * @description Composant principal de l'application Life Goals.
  *              Gere l'etat global des objectifs hierarchiques.
- * @version 2.0.0
+ * @version 2.2.0
  * 
  * @changelog
+ * v2.2.0 - Validation explicite des parents (suppression auto-completion)
+ * v2.1.0 - Synchronisation input/modal
  * v2.0.0 - Ajout du support hierarchique (parent/enfants)
  * 
  * MODIFICATIONS EFFECTUEES:
@@ -13,11 +15,12 @@
  * 2. Nouveaux etats: addingToParentId pour gerer l'ajout de sous-objectifs
  * 3. Nouvelles fonctions: getChildren(), areAllChildrenDone(), hasChildren(), isEffectivelyDone()
  * 4. Modification deleteGoalHandler: Suppression en cascade des enfants
- * 5. Modification doneGoalHandler: Mise a jour automatique des parents quand tous enfants done
+ * 5. [MODIFICATION v2.2] doneGoalHandler: Suppression auto-completion parent
  * 6. Modification undoGoalHandler: Remise en cours des parents quand un enfant est undo
  * 7. Nouvelle fonction: addSubGoalHandler() pour ajouter des sous-objectifs
  * 8. Filtrage: activeRootGoals et completedRootGoals basés sur isEffectivelyDone()
  * 9. Props supplementaires passes aux composants enfants (getChildren, isEffectivelyDone, etc.)
+ * 10. [AJOUT v2.1] inputText, initialModalText, openAddModalWithText pour sync input/modal
  */
 
 import { useState, useRef } from 'react';
@@ -251,44 +254,16 @@ export default function App() {
 
   /**
    * [MODIFICATION v2.0] Marque un objectif comme termine
-   * Met a jour automatiquement le parent si tous les enfants sont done
+   * [MODIFICATION v2.2] Suppression de l'auto-completion du parent
+   * Le parent doit etre valide explicitement par l'utilisateur
    * @param {string} id - ID de l'objectif
    */
   const doneGoalHandler = (id) => {
-    setGoals((currentGoals) => {
-      // Marque l'objectif comme done
-      let updated = currentGoals.map((goal) =>
+    setGoals((currentGoals) =>
+      currentGoals.map((goal) =>
         goal.id === id ? { ...goal, done: true } : goal
-      );
-      
-      /**
-       * [AJOUT v2.0] Met a jour recursivement les parents
-       * Si tous les freres/soeurs sont done, le parent devient done aussi
-       * @param {Goal[]} goals - Liste des objectifs
-       * @param {string} goalId - ID de l'objectif modifie
-       * @returns {Goal[]} Liste mise a jour
-       */
-      const updateParents = (goals, goalId) => {
-        const goal = goals.find((g) => g.id === goalId);
-        if (!goal || !goal.parentId) return goals;
-        
-        // Verifie si tous les freres/soeurs sont done
-        const siblings = goals.filter((g) => g.parentId === goal.parentId);
-        const allSiblingsDone = siblings.every((s) => s.done);
-        
-        if (allSiblingsDone) {
-          // Marque le parent comme done
-          goals = goals.map((g) =>
-            g.id === goal.parentId ? { ...g, done: true } : g
-          );
-          // Continue vers le grand-parent (recursif)
-          return updateParents(goals, goal.parentId);
-        }
-        return goals;
-      };
-      
-      return updateParents(updated, id);
-    });
+      )
+    );
     
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 3000);

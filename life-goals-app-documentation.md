@@ -291,12 +291,13 @@ npm run web      # Lance dans le navigateur
 
 ## Regles metier hierarchiques
 
-1. **Un objectif parent ne peut pas etre marque "done" manuellement**
-   - Le bouton coche n'apparait que sur les feuilles (objectifs sans enfants)
+1. **Un objectif parent doit etre valide explicitement** [v2.2]
+   - Le bouton coche apparait sur les parents quand tous leurs enfants sont done
+   - Cliquer sur la coche valide le parent (pas d'auto-completion)
 
-2. **Auto-completion du parent**
-   - Quand tous les enfants sont done, le parent devient automatiquement done
-   - Cette regle s'applique recursivement (grand-parent, etc.)
+2. **Condition pour valider un parent**
+   - Un parent peut etre marque "done" seulement si tous ses enfants sont done
+   - Cette contrainte empeche de valider un parent avec des enfants non termines
 
 3. **Cascade undo**
    - Remettre un enfant en cours remet automatiquement tous ses ancetres en cours
@@ -307,11 +308,18 @@ npm run web      # Lance dans le navigateur
 
 5. **Statut effectif**
    - `isEffectivelyDone(goal)` calcule le vrai statut en tenant compte des enfants
-   - Un parent est "effectivement done" ssi tous ses enfants le sont (recursif)
+   - Un parent est "effectivement done" ssi il est done ET tous ses enfants le sont
 
 ---
 
 ## Changelog
+
+### v2.2.0 - Validation explicite des parents
+
+- Suppression de l'auto-completion des parents
+- Un parent doit etre valide explicitement meme si tous ses enfants sont done
+- Le bouton coche apparait sur les parents quand tous leurs enfants sont done
+- Nouvelle variable `canBeMarkedDone` dans GoalItem
 
 ### v2.1.0 - Synchronisation input/modal
 
